@@ -1,7 +1,7 @@
-import express from "express";
-import cors from "cors";
-import { WebSocket } from "ws";
-import { randomUUID } from "crypto";
+const express = require("express");
+const cors = require("cors");
+const { WebSocket } = require("ws");
+const crypto = require("crypto");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -23,8 +23,8 @@ app.post("/api/edge-tts", async (req, res) => {
   }
 
   const voice = voiceName || "my-MM-NilarNeural";
-  const connectionId = randomUUID().replace(/-/g, "");
-  const wsUrl = wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1?TrustedClientToken=${TRUSTED_CLIENT_TOKEN}&ConnectionId=${connectionId};
+  const connectionId = crypto.randomUUID().replace(/-/g, "");
+  const wsUrl = `wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1?TrustedClientToken=${TRUSTED_CLIENT_TOKEN}&ConnectionId=${connectionId}`;
 
   const audioChunks = [];
   let isClosed = false;
@@ -65,12 +65,12 @@ app.post("/api/edge-tts", async (req, res) => {
       }
     });
 
-    ws.send(Content-Type:application/json; charset=utf-8\r\nPath:speech.config\r\n\r\n${speechConfig});
+    ws.send(`Content-Type:application/json; charset=utf-8\r\nPath:speech.config\r\n\r\n${speechConfig}`);
 
     let rateStr = "+0%";
     if (typeof rate === "number") {
       const pct = Math.round((rate - 1.0) * 100);
-      rateStr = ${pct >= 0 ? "+" : ""}${pct}%;
+      rateStr = `${pct >= 0 ? "+" : ""}${pct}%`;
     } else if (typeof rate === "string") {
       rateStr = rate;
     }
@@ -78,7 +78,7 @@ app.post("/api/edge-tts", async (req, res) => {
     let pitchStr = "+0Hz";
     if (typeof pitch === "number") {
       const pct = Math.round((pitch - 1.0) * 100);
-      pitchStr = ${pct >= 0 ? "+" : ""}${pct}Hz;
+      pitchStr = `${pct >= 0 ? "+" : ""}${pct}Hz`;
     } else if (typeof pitch === "string") {
       pitchStr = pitch;
     }
@@ -86,7 +86,7 @@ app.post("/api/edge-tts", async (req, res) => {
     let volumeStr = "+0%";
     if (typeof volume === "number") {
       const pct = Math.round((volume - 1.0) * 100);
-      volumeStr = ${pct >= 0 ? "+" : ""}${pct}%;
+      volumeStr = `${pct >= 0 ? "+" : ""}${pct}%`;
     } else if (typeof volume === "string") {
       volumeStr = volume;
     }
@@ -96,10 +96,10 @@ app.post("/api/edge-tts", async (req, res) => {
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;");
 
-    const requestId = randomUUID().replace(/-/g, "");
-    const ssml = <speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='en-US'><voice name='${voice}'><prosody pitch='${pitchStr}' rate='${rateStr}' volume='${volumeStr}'>${escapedText}</prosody></voice></speak>;
+    const requestId = crypto.randomUUID().replace(/-/g, "");
+    const ssml = `<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='en-US'><voice name='${voice}'><prosody pitch='${pitchStr}' rate='${rateStr}' volume='${volumeStr}'>${escapedText}</prosody></voice></speak>`;
 
-    ws.send(X-RequestId:${requestId}\r\nContent-Type:application/ssml+xml\r\nPath:ssml\r\n\r\n${ssml});
+    ws.send(`X-RequestId:${requestId}\r\nContent-Type:application/ssml+xml\r\nPath:ssml\r\n\r\n${ssml}`);
   });
 
   ws.on("message", (data, isBinary) => {
@@ -119,7 +119,9 @@ app.post("/api/edge-tts", async (req, res) => {
       if (messageStr.includes("Path:turn.end")) {
         isClosed = true;
         clearTimeout(timeout);
-        ws.close();if (audioChunks.length === 0) {
+        ws.close();
+
+        if (audioChunks.length === 0) {
           if (!res.headersSent) {
             return res.status(500).json({ error: "No audio generated from Edge TTS" });
           }
@@ -134,7 +136,7 @@ app.post("/api/edge-tts", async (req, res) => {
     }
   });
 
-  ws.on("error", (err) => {
+wson  .("error", (err) => {
     clearTimeout(timeout);
     if (!res.headersSent) {
       res.status(500).json({ error: "Edge TTS WebSocket error: " + err.message });
@@ -147,6 +149,5 @@ app.post("/api/edge-tts", async (req, res) => {
 });
 
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(🚀 Edge TTS Server running on port ${PORT});
+  console.log(`🚀 Edge TTS Server running on port ${PORT}`);
 });
-        

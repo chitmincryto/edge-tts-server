@@ -136,7 +136,7 @@ app.post("/api/edge-tts", async (req, res) => {
     }
   });
 
-wson  .("error", (err) => {
+  ws.on("error", (err) => {
     clearTimeout(timeout);
     if (!res.headersSent) {
       res.status(500).json({ error: "Edge TTS WebSocket error: " + err.message });
